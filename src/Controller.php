@@ -24,10 +24,15 @@ class Controller {
 		if($yes_view==1)
 		{
 		
-			/*\PhangoApp\PhaView\View::$folder_env[]='vendor/'.Routes::$prefix_path[$this->name].$this->name.'/views';
-			\PhangoApp\PhaView\View::$media_env[]='vendor/'.Routes::$prefix_path[$this->name].$this->name;*/
-		
+            $loader=new \Twig_Loader_Filesystem([$this->route->module_path.'/templates', $this->route->real_path.'/themes']);
+ 
+            $this->twig=new \Twig_Environment($loader, array(
+                'cache' => $this->route->real_path.'/tmp/cache',
+            ));
+ 
 		}
+        
+        //Load config
 
 	}
 
