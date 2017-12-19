@@ -37,6 +37,8 @@ class Router {
     public $controller_path;
     
     public $real_path;
+    
+    public $on_rewrite=false;
 
     public function __construct($name, $controller_path) 
     {
@@ -56,11 +58,14 @@ class Router {
         $this->module_path=$this->base_path.$name;
  
         $this->real_path=$arr_path[0];
+        
+        $this->extended_path=dirname($_SERVER['SCRIPT_NAME']);
  
     }
     
     public function run()
     {
+        
         ob_start();
         
         if(is_file($this->base_path.$this->controller_path.'.php'))
@@ -132,7 +137,8 @@ class Router {
                         settype($parameters[$x], $type);
                         
                     }
-                                    
+                
+                    //Check in mod_rewrite
                     
                     if(!call_user_func_array(array($controller_class, $method), $parameters)===false)
                     {
@@ -199,6 +205,64 @@ class Router {
 		//$this->response($url404);
 	}
 
+    /**
+    * Simple method for make an url
+    *
+    * @param $url_path string The url path of the url
+    * @param $controller_query An array from the variables of controller method
+    * @param $query An array from create variables of a typical url Example. ?op=1&arg1=string
+    * @param $base_file If you are creating a url of other router file you can use this variable
+    */
+    
+    public function make_url($url_path, $controller_query=[], $query=[], $base_file='')
+    {
+        
+        $final_url='';
+
+        if(!$base_file)
+        {
+            
+            $base_file=basename($_SERVER['SCRIPT_NAME']);
+            
+        }
+        
+        if(!$this->on_rewrite)
+        {
+            
+            $final_url=$this->extended_path.'/'.$base_file.'/'.$url_path.'/';
+            
+        }
+        else
+        {
+
+            $base_file=str_replace('.php', '', $base_file).'/';
+
+            if($base_file=='index/') {
+            
+                $base_file='';
+            }
+            
+            $final_url=$this->extended_path.'/'.$base_file.$url_path.'/';
+            
+        }
+            
+        if(count($controller_query)>0)
+        {
+        
+            $final_url.='get/'.implode('/', $controller_query);
+            
+        }
+
+        if(count($query)>0)
+        {
+        
+            $final_url.='?'.http_build_query($query);
+            
+        }
+        
+        return $final_url;
+        
+    }
 
 }
 

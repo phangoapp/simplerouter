@@ -35,6 +35,13 @@ class Controller {
         //Load config
 
 	}
+    
+    public function make_url($route, $url)
+    {
+        
+        
+        
+    }
 
 }
 
